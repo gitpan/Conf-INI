@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use Tie::Cfg;
 
-our $VERSION='0.03';
+our $VERSION='0.04';
 
 sub new {
   my $class=shift;
@@ -78,11 +78,11 @@ return @vars;
 
 __END__
 
-=head1 Name
+=head1 NAME
 
-An .ini file backend for conf
+Conf::INI - a .ini file backend for conf
 
-=head1 Abstract
+=head1 ABSTRACT
 
 C<Conf::INI> is an INI file (windows alike) backend for Conf. 
 It handles a an INI file with identifiers that are 
@@ -98,7 +98,7 @@ commit to the .ini file.
 Each call C<set()> will immediately result in a commit 
 to the database.
 
-=head2 C<new(filename> --E<gt> Conf::INI
+=head2 C<new(filename) --E<gt> Conf::INI>
 
 Invoked with a valid filename, 
 will return a Conf::INI object that is connected to
