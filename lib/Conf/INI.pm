@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use Config::IniFiles;
 
-our $VERSION='0.06';
+our $VERSION='0.07';
 
 my $DEFSECT="!!Conf::INI!!default!!";
 

@@ -59,7 +59,7 @@ ok($conf->get("section.oesterhol") eq "HI!", "initial conf in \$string -> oester
 
 ### Delete a couple of keys
 
-$conf->del("oesterhol");
+$conf->del("section.oesterhol");
 $conf->del("test1");
 
 my %e;
@@ -78,7 +78,7 @@ for my $k (keys %e) {
 
 ok($all==1,"variables: --> all variables are there");
 ok((not defined $conf->get("test1")),"deleted var not there");
-ok((not defined $conf->get("oesterhol")),"deleted var not there");
+ok((not defined $conf->get("section.oesterhol")),"deleted var not there");
 
 
 

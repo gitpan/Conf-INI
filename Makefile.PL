@@ -6,7 +6,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     'NAME'		=> 'Conf::INI',
     'VERSION_FROM'	=> 'lib/Conf/INI.pm',
-    'PREREQ_PM'		=> { Tie::Cfg => 0.3 , Conf => 0.04 },
+    'PREREQ_PM'		=> { Config::IniFiles => 2.38 , Conf => 0.09 },
     'ABSTRACT_FROM'     => 'lib/Conf/INI.pm',
     'AUTHOR'            => 'Hans Oesterholt-Dijkema <oesterhol@cpan.org>',
 );
