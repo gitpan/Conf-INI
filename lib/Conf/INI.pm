@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use Tie::Cfg;
 
-our $VERSION='0.01';
+our $VERSION='0.02';
 
 sub new {
   my $class=shift;
@@ -80,7 +80,7 @@ __END__
 
 =head1 Name
 
-Conf::INI - The INI file backend for conf
+Conf::INI, an .ini file backend for conf
 
 =head1 Abstract
 
