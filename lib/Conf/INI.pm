@@ -2,18 +2,31 @@ package Conf::INI;
 
 use 5.006;
 use strict;
-use Tie::Cfg;
+use Config::IniFiles;
 
-our $VERSION='0.04';
+our $VERSION='0.06';
+
+my $DEFSECT="!!Conf::INI!!default!!";
 
 sub new {
   my $class=shift;
   my $file=shift;
 
   my $self;
+  my $ini;
 
-  tie my %ini, 'Tie::Cfg', READ => $file, WRITE => $file;
-  $self->{"ini"}=\%ini;
+  if ((-z $file) or (not -e $file)) {
+    $ini=new Config::IniFiles();
+    $ini->newval($DEFSECT,$DEFSECT,1);
+    print $ini->val($DEFSECT,$DEFSECT),"\n";
+     $ini->WriteConfig($file);
+  }
+  $ini=new Config::IniFiles(-file => $file);
+  if (not defined $ini) {
+    die "Cannot open ini file $file\n";
+  }
+
+  $self->{"ini"}=$ini;
 
   bless $self,$class;
 
@@ -22,7 +35,7 @@ return $self;
 
 sub DESTROY {
   my $self=shift;
-  untie %{$self->{"ini"}};
+  $self->{"ini"}->RewriteConfig();
 }
 
 sub set {
@@ -33,10 +46,11 @@ sub set {
   my ($section,$var)=split /[.]/,$var,2;
   if (not defined $var) {
     $var=$section;
-    $section="!!Conf::INI!!default!!";
+    $section=$DEFSECT;
   }
-
-  $self->{"ini"}->{$section}{$var}=$val;
+  if (not defined $self->{"ini"}->setval($section,$var,$val)) {
+    $self->{"ini"}->newval($section,$var,$val);
+  }
 }
 
 sub get {
@@ -46,29 +60,37 @@ sub get {
   my ($section,$var)=split /[.]/,$var,2;
   if (not defined $var) {
     $var=$section;
-    $section="!!Conf::INI!!default!!";
+    $section=$DEFSECT;
   }
+return $self->{"ini"}->val($section,$var);
+}
 
-return $self->{"ini"}->{$section}{$var};
+sub del {
+  my $self=shift;
+  my $var=shift;
+
+  my ($section,$var)=split /[.]/,$var,2;
+  if (not defined $var) {
+    $var=$section;
+    $section=$DEFSECT;
+  }
+  $self->{"ini"}->delval($section,$var);
 }
 
 sub variables {
   my $self=shift;
   my @vars;
 
-  for my $k (keys %{$self->{"ini"}}) {
-    if (ref($self->{"ini"}->{$k}) eq "HASH") {
-      for my $v (keys %{$self->{"ini"}->{$k}}) {
-	if ($k eq "!!Conf::INI!!default!!") {
+  for my $s ($self->{"ini"}->Sections()) {
+    for my $v ($self->{"ini"}->Parameters($s)) {
+      if ($s eq $DEFSECT) { 
+	if ($v ne $DEFSECT) {
 	  push @vars,$v;
 	}
-	else {
-	  push @vars,"$k.$v";
-	}
       }
-    }
-    else {
-      push @vars,$k;
+      else {
+	push @vars,"$s.$v";
+      }
     }
   }
 return @vars;
@@ -91,7 +113,7 @@ are divided in a section and a variable.
 
 =head1 Description
 
-This module uses Tie::Cfg for reading and writing .INI files.
+This module uses Config::IniFiles for reading and writing .INI files.
 Each call to C<set()> will B<not> immediately result in a 
 commit to the .ini file.
 
@@ -126,6 +148,10 @@ will result in:
 Reads var from config. Returns C<undef>, if var does not
 exist. Returns the value of configuration item C<var>,
 otherwise.
+
+=head2 C<del(var) --E<gt> void>
+
+Deletes variable var from the Configuration.
 
 =head2 C<variables() --E<gt> list of strings>
 

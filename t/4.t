@@ -5,7 +5,7 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 8;
+use Test::More tests => 11;
 BEGIN { 
 	use_ok('Conf');
 	use_ok('Conf::INI');
@@ -56,6 +56,29 @@ ok($all==1,"variables: --> all variables are there");
 
 $conf->set("section.oesterhol","HI!");
 ok($conf->get("section.oesterhol") eq "HI!", "initial conf in \$string -> oesterhol=HI!");
+
+### Delete a couple of keys
+
+$conf->del("oesterhol");
+$conf->del("test1");
+
+my %e;
+$e{"test"}=0;
+$e{"test2"}=0;
+
+my @vars=$conf->variables();
+for my $var (@vars) {
+	$e{$var}+=1;
+}
+
+my $all=1;
+for my $k (keys %e) {
+	if ($e{$k}==0) { $all=0; }
+}
+
+ok($all==1,"variables: --> all variables are there");
+ok((not defined $conf->get("test1")),"deleted var not there");
+ok((not defined $conf->get("oesterhol")),"deleted var not there");
 
 
 
